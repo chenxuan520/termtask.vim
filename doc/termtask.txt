@@ -1,0 +1,37 @@
+*TermTask*  The task system for vim
+==============================================================================
+CONTENTS                                                     *termtask-contents*
+
+    INTRO .......................................... |termtask-intro|
+    COMMANDS ....................................... |termtask-commands|
+    OPTIONS ........................................ |termtask-options|
+==============================================================================
+INTRO                                                           *termtask-intro*
+
+termtask is a plugin that make vim task system and run task.
+
+==============================================================================
+COMMANDS                                                     *termtask-commands*
+
+                                                              *termtask-:TaskRun*
+>
+    :TaskRun <task-name>
+<
+run <task-name> task
+                                                              *termtask-:TaskConfig*
+>
+    :TaskConfig
+<
+open task config file
+==============================================================================
+
+OPTIONS                                                       *termtask-options*
+------------------------------------------------------------------------------
+                                                      *g:termtask_auto_load*
+    let g:termtask_auto_load=1(default is 0)
+
+if set ,every time to open vim will auto find .config.vim file to
+load,otherwise it will be load after :TaskRun
+
+==============================================================================
+vim:tw=78:sw=4:ts=8:ft=help:norl:noet:
