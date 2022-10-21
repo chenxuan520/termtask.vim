@@ -7,7 +7,6 @@ func! s:FindConfigWay()
 		endif
 	endwhile
 	if strridx(s:gitdir,"/")==-1
-		echo "cannot find git dir"
 		return ""
 	endif
 	let s:gitdir=s:gitdir."/.config.vim"
@@ -109,7 +108,12 @@ endfunction
 
 " read diff config for diff project
 func! termtask#Term_config_edit()
-	execute ":edit ".s:FindConfigWay()
+	let s:git_dir=s:FindConfigWay()
+	if s:git_dir!=""
+		execute ":edit ".s:FindConfigWay()
+	else
+		echo "can not find .git dir"
+	endif
 endfunc
 
 " read from git dir
