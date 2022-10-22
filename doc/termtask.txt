@@ -23,6 +23,11 @@ run <task-name> task
     :TaskConfig
 <
 open task config file
+                                                              *termtask-:TaskList*
+>
+    :TaskList
+<
+get all task name list
 ==============================================================================
 
 OPTIONS                                                       *termtask-options*
