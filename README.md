@@ -29,9 +29,9 @@ plug 'chenxuan520/termtask.vim'
 #### config file editor
 
 - Use :TaskConfig to quickly open the project configuration file (no new one is created automatically)
-  
+
   > Note: The config file molen is .config.vim, which by default is in the project root directory (there is a .git folder directory)
-  > 
+  >
   > If the .git folder does not exist upwards, it will echo the error directly
 
 #### Task execution
@@ -61,13 +61,13 @@ let g:Term_project_task=[
 - command is the task command, shells can be separated by && only
 
 - path is the path to run
-  
+
   > termtask#Term_get_dir() is the project root directory
-  > 
+  >
   > expand("%:p:h") for the current buffer directory
-  > 
+  >
   > The directory can be accessed using . link
-  > 
+  >
   > such as termtask#Term_get_dir() . "/src"
 
 - close is whether to close automatically at the end of the run, default is 0 (no close)

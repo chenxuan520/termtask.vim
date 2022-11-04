@@ -37,6 +37,9 @@ OPTIONS                                                       *termtask-options*
 
 if set ,every time to open vim will auto find .config.vim file to
 load,otherwise it will be load after :TaskRun
+                                                      *g:term_cmd*
+    let g:term_cmd="ici"(default "")
 
+set to easy run cmd show as echo,usually use to translate
 ==============================================================================
 vim:tw=78:sw=4:ts=8:ft=help:norl:noet:

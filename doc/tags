@@ -1,4 +1,5 @@
 TermTask	termtask.txt	/*TermTask*
+g:term_cmd	termtask.txt	/*g:term_cmd*
 g:termtask_auto_load	termtask.txt	/*g:termtask_auto_load*
 termtask-:TaskConfig	termtask.txt	/*termtask-:TaskConfig*
 termtask-:TaskList	termtask.txt	/*termtask-:TaskList*
