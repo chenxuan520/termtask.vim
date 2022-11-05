@@ -8,6 +8,10 @@
 
 - [中文readme](./README.cn.md)
 
+## Effect
+
+[bilibili](https://www.bilibili.com/video/BV1s14y1V7Na/)
+
 ## Dependencies
 
 - If you need to use quickfix asynchronous output, depend on [asyncrun](https://github.com/skywind3000/asyncrun.vim)

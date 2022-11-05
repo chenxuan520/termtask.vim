@@ -6,6 +6,10 @@
 
 - **chenxuan**
 
+## 效果
+
+[bilibili](https://www.bilibili.com/video/BV1s14y1V7Na/)
+
 ## 依赖
 
 - 如果需要使用quickfix异步输出,依赖[asyncrun](https://github.com/skywind3000/asyncrun.vim)
@@ -27,6 +31,7 @@ plug 'chenxuan520/termtask.vim'
 #### config文件编辑
 
 - 使用:TaskConfig快速打开项目配置文件(没有自动新建)
+
   
   > 注意: 配置文件moren为.config.vim,默认在项目根目录(有.git文件夹目录)
   > 
@@ -59,6 +64,7 @@ let g:Term_project_task=[
 - command 为任务指令,shell可以只用&&隔开
 
 - path为运行的路径
+
   
   > termtask#Term_get_dir() 为项目根目录
   > 
