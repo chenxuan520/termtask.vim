@@ -21,7 +21,7 @@
 #### plug
 
 ```vim
-plug 'skywind3000/asyncrun.vim'(可选)
+plug 'skywind3000/asyncrun.vim' (可选)
 
 plug 'chenxuan520/termtask.vim'
 ```

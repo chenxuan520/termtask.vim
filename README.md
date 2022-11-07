@@ -23,7 +23,7 @@
 #### plug
 
 ```vim
-plug 'skywind3000/asyncrun.vim' (optional)
+plug 'skywind3000/asyncrun.vim' "(optional)
 
 plug 'chenxuan520/termtask.vim'
 ```
