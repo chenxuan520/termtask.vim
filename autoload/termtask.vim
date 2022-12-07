@@ -140,7 +140,9 @@ function! termtask#Term_task_run(name)
 			execute ":nnoremap " . s:task['key'] . ' :call <sid>Term_read("' . s:task['name'] . '")<cr>'
 		endif
 	endfor
-	call <sid>Term_read(a:name)
+	if a:name!=''
+		call <sid>Term_read(a:name)
+	endif
 endfunction
 
 " read diff config for diff project
@@ -191,4 +193,20 @@ func! termtask#Term_cmd_exec(mode)
 		return
 	endif
 	echo system(s:cmd.' '.@s)
+endfunc
+
+" set cmd popup
+func! termtask#Term_cmd_exec_popup(mode)
+	if a:mode=='v'
+		norm! gv"sy
+	else
+		let @s=expand('<cword>')
+	endif
+	let s:cmd=get(g:,"term_cmd","")
+	if s:cmd==""
+		echo "cmd no define"
+		return
+	endif
+	let s:result=system(s:cmd.' '.@s)
+	call popup_atcursor(s:result,{})
 endfunc
