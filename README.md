@@ -48,12 +48,12 @@ plug 'chenxuan520/termtask.vim'
 let g:Term_project_task=[
             \{
             \'name' : 'build',
-            \\'command' : 'ls -alh',
-            \'path' : termtask#Term_get_dir(),
+            \'command' : 'ls -alh',
+            \'mode' : 'quickfix'
+            \'path' : s:root,
             \'close' : 0,
             \'type' : 'vsplit',
             \'key' : '\1',
-            \'quickfix' : 1,
             \'pre_script' : '',
             \'end_script' : '',
             \},
@@ -64,9 +64,17 @@ let g:Term_project_task=[
 
 - command is the task command, shells can be separated by && only
 
+- mode is one of workflow,term,quickfix which is stand for diff mode(default term)
+
+  - quickfix is use quickfix as output, default is 0, 1 requires [asyncrun](https://github.com/skywind3000/asyncrun.vim)
+
+  - term is use inside term command to exec
+
+  - **workflow** is connect for two tasks,such as compile and if success execute the program else show the error
+
 - path is the path to run
 
-  > termtask#Term_get_dir() is the project root directory
+  > termtask#Term_get_dir() and s:root is the project root directory
   >
   > expand("%:p:h") for the current buffer directory
   >
@@ -78,7 +86,6 @@ let g:Term_project_task=[
 
 - key is the bound shortcut key map
 
-- quickfix is whether to use quickfix as output, default is 0, 1 requires [asyncrun](https://github.com/skywind3000/asyncrun.vim)
 
 - pre_script/end_script is the vimscript script that needs to be executed before and after the task is executed
 

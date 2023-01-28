@@ -6,33 +6,75 @@
 "
 "======================================================================
 
+let s:dictname={}
 func! s:FindConfigWay()
-	let s:gitdir=getcwd()."/"
-	while strridx(s:gitdir,"/")!=-1
-		let s:gitdir=strpart(s:gitdir,0,strridx(s:gitdir,"/"))
-		if isdirectory(s:gitdir . "/.git")
-			break
+	let s:gitdir = finddir(".git", getcwd() .';')
+	if !empty(s:gitdir)
+		if s:gitdir==".git"
+			let s:gitdir=getcwd()
+		else
+			let s:gitdir=strpart(s:gitdir,0,strridx(s:gitdir,"/"))
 		endif
-	endwhile
-	if strridx(s:gitdir,"/")==-1
-		return ""
+		let s:gitdir=s:gitdir."/.config.vim"
+		return s:gitdir
 	endif
-	let s:gitdir=s:gitdir."/.config.vim"
-	return s:gitdir
+	return ""
+	" let s:gitdir=getcwd()."/"
+	" while strridx(s:gitdir,"/")!=-1
+	" 	let s:gitdir=strpart(s:gitdir,0,strridx(s:gitdir,"/"))
+	" 	if isdirectory(s:gitdir . "/.git")
+	" 		break
+	" 	endif
+	" endwhile
+	" if strridx(s:gitdir,"/")==-1
+	" 	return ""
+	" endif
+	" let s:gitdir=s:gitdir."/.config.vim"
+	" return s:gitdir
 endfunc
 
 func! s:FindRoot()
-	let s:gitdir=getcwd()."/"
-	while strridx(s:gitdir,"/")!=-1
-		let s:gitdir=strpart(s:gitdir,0,strridx(s:gitdir,"/"))
-		if isdirectory(s:gitdir . "/.git")
-			break
+	let s:gitdir = finddir(".git", getcwd() .';')
+	if !empty(s:gitdir)
+		if s:gitdir==".git"
+			let s:gitdir=getcwd()
+		else
+			let s:gitdir=strpart(s:gitdir,0,strridx(s:gitdir,"/"))
 		endif
-	endwhile
-	if strridx(s:gitdir,"/")==-1
-		return ""
+		return s:gitdir
 	endif
-	return s:gitdir
+	return ""
+	" let s:gitdir=getcwd()."/"
+	" while strridx(s:gitdir,"/")!=-1
+	" 	let s:gitdir=strpart(s:gitdir,0,strridx(s:gitdir,"/"))
+	" 	if isdirectory(s:gitdir . "/.git")
+	" 		break
+	" 	endif
+	" endwhile
+	" if strridx(s:gitdir,"/")==-1
+	" 	return ""
+	" endif
+	" return s:gitdir
+endfunc
+
+func! s:Workflow(dict) abort
+	let dict=a:dict
+	if !has_key(dict,'begin')||!has_key(dict,'next')
+		echom 'define no ok'
+		return
+	endif
+	if !has_key(s:dictname,dict['begin'])||!has_key(s:dictname,dict['next'])
+		echoerr 'no such task'
+		return
+	endif
+	let begin=s:dictname[dict['begin']]|let index=begin['index']
+	if get(begin,'quickfix',0)==0&&get(begin,'mode','')!='quickfix'
+		echoerr 'begin is not a quick func'
+		return
+	endif
+	let g:Term_project_task[index]['next']=dict['next']
+	call s:Term_read(dict['begin'])
+	return
 endfunc
 
 function! s:Term_read(name)
@@ -47,6 +89,20 @@ function! s:Term_read(name)
 		endif
 
 		let s:exist=1
+
+		if has_key(s:task, 'mode')
+			if s:task['mode']=='quickfix'
+				let s:task['quickfix']=1
+			elseif s:task['mode']=='term'
+				let s:task['quickfix']=0
+			elseif s:task['mode']=='workflow'
+				call s:Workflow(s:task)
+				return
+			else
+				echom "unknown task mode"
+				return
+			endif
+		endif
 
 		if !has_key(s:task,'command')
 			echom s:task['name'].' command is null'
@@ -82,6 +138,10 @@ function! s:Term_read(name)
 		endif
 
 		if has_key(s:task,'quickfix')&&s:task['quickfix']
+			if has_key(s:task, 'next')&&s:task['next']!=''
+				let g:asyncrun_exit="if g:asyncrun_code==0|cclose|call termtask#Term_task_run('".s:task['next']."')|endif|"
+			endif
+
 			if has_key(s:task,'type')&&s:task['type']=='tab'
 				let s:options['pos']='tab'
 			elseif has_key(s:task,'type')&&s:task['type']=='vsplit'
@@ -127,21 +187,30 @@ function! s:Term_read(name)
 
 endfunction
 
-function! termtask#Term_task_run(name)
+function! termtask#Term_task_run(name) abort
+	let s:dictname={}|let i=0
 	if filereadable(s:FindConfigWay())
 		execute ":source ". s:gitdir
 		echo "load success"
 	else
+		echohl WarningMsg
 		echo "no config file"
+		echohl NONE
 		return
 	endif
 	for s:task in g:Term_project_task
-		if has_key(s:task,'key')&&has_key(s:task,'name')&&s:task['key']!=''
+		if !has_key(s:task,'name')||s:task['name']==''
+			echoerr "task need name"
+			return
+		endif
+		if has_key(s:task,'key')&&s:task['key']!=''
 			execute ":nnoremap " . s:task['key'] . ' :call <sid>Term_read("' . s:task['name'] . '")<cr>'
 		endif
+		let s:dictname[s:task["name"]]=s:task|let s:dictname[s:task["name"]]["index"]=i
+		let i+=1
 	endfor
 	if a:name!=''
-		call <sid>Term_read(a:name)
+		call s:Term_read(a:name)
 	endif
 endfunction
 
@@ -165,7 +234,9 @@ func! termtask#Term_task_list(A,C,P)
 	if filereadable(s:FindConfigWay())
 		execute ":source ". s:gitdir
 	else
+		echohl WarningMsg
 		echo "no config file"
+		echohl NONE
 		return
 	endif
 
@@ -196,11 +267,9 @@ func! termtask#Term_cmd_exec(mode)
 		let @s=expand('<cword>')
 	endif
 	let s:cmd=get(g:,"term_cmd","")
-	if s:cmd==""
-		echo "cmd no define"
-		return
+	if s:cmd==""|echo "cmd no define"|return
 	endif
-	echo system(s:cmd.' '.@s)
+	echo system(s:cmd.' "'.@s.'"')
 endfunc
 
 " set cmd popup
@@ -211,10 +280,10 @@ func! termtask#Term_cmd_exec_popup(mode)
 		let @s=expand('<cword>')
 	endif
 	let s:cmd=get(g:,"term_cmd","")
-	if s:cmd==""
-		echo "cmd no define"
-		return
+	if s:cmd==""|echo "cmd no define"|return
 	endif
-	let s:result=system(s:cmd.' '.@s)
-	call popup_atcursor(s:result,{})
+	let result=system(s:cmd.' "'.@s.'"')
+	let text=split(result,"\n")
+	if result==""|let text="no message"|endif
+	call popup_atcursor(text,{})
 endfunc
