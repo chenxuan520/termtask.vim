@@ -50,8 +50,7 @@ func! s:Workflow(dict) abort
 	endif
 	let begin=s:dictname[dict['begin']]|let index=begin['index']
 	if get(begin,'quickfix',0)==0&&get(begin,'mode','')!='quickfix'
-		echoerr 'begin is not a quick func'
-		return
+		let g:Term_project_task[index]['end_script']=''
 	endif
 	let g:Term_project_task[index]['next']=dict['next']
 	call s:Term_read(dict['begin'])
@@ -79,6 +78,14 @@ function! s:Term_read(name)
 				let s:task['quickfix']=0
 			elseif s:task['mode']=='workflow'
 				call s:Workflow(s:task)
+				return
+			elseif s:task['mode']=='shell'
+				if !has_key(s:task,'command')
+					echom s:task['name'].' command is null'
+					return
+				endif
+				echo system(s:task['command'])
+				let g:term_exit_code=0
 				return
 			else
 				echom "unknown task mode"
@@ -119,10 +126,12 @@ function! s:Term_read(name)
 			endif
 		endif
 
+		if has_key(s:task, 'next')&&s:task['next']!=''
+			let g:asyncrun_exit="if g:asyncrun_code==0|cclose|call termtask#Term_task_run('".s:task['next']."')|endif|"
+			let s:term_fin_exec="if g:term_exit_code==0|call termtask#Term_task_run('".s:task['next']."')|endif"
+		endif
+
 		if has_key(s:task,'quickfix')&&s:task['quickfix']
-			if has_key(s:task, 'next')&&s:task['next']!=''
-				let g:asyncrun_exit="if g:asyncrun_code==0|cclose|call termtask#Term_task_run('".s:task['next']."')|endif|"
-			endif
 
 			if has_key(s:task,'type')&&s:task['type']=='tab'
 				let s:options['pos']='tab'
@@ -153,7 +162,7 @@ function! s:Term_read(name)
 
 		if has_key(s:task,'end_script')
 			let s:options['exit_cb']="termtask#Term_Cb"
-			let s:term_fin_exec=s:task['end_script']
+			let s:term_fin_exec=s:term_fin_exec.s:task['end_script']
 		endif
 
 		if has_key(s:task,'type')&&s:task['type']=='tab'
@@ -204,6 +213,7 @@ endfunction
 
 fun! termtask#Term_Cb(chan,msg)
 	let g:term_exit_code=a:msg
+	echom a:msg
 	if s:term_fin_exec!=''
 		exec s:term_fin_exec
 	endif
